@@ -40,4 +40,5 @@ while task.wait() do
 if game:GetService("Players").Michaweeelick.PlayerGui["SG_Package"].MainGui["frame_heistResults"].Visible then
 game:GetService("TeleportService"):Teleport(21532277, game.Players.LocalPlayer)
 end
+end
 end)
