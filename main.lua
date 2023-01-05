@@ -1,5 +1,3 @@
-shared.Heist
-
 -- this is by far my shittiest code ever made.
 local replicatedstorage = game:GetService("ReplicatedStorage")
 
@@ -15,7 +13,7 @@ if shared.Heist == "Shadow Raid" then
 replicatedstorage.MakeLobby:InvokeServer("Shadow Raid", "Nightmare", 1, "PUBLIC", "Stealth", false, false, 1, false, false, {})
 
 queue_on_teleport([[
-
+loadstring(game:HttpGet("https://raw.githubusercontent.com/frel0/notoriety-autowin/main/heists/shadow-raid.lua"))();
 ]])
 
 wait(0.1)
