@@ -1,4 +1,4 @@
-wait(2)
+wait(2.64)
 -- this is by far my shittiest code ever made.
 local replicatedstorage = game:GetService("ReplicatedStorage")
 
@@ -17,7 +17,7 @@ queue_on_teleport([[
 loadstring(game:HttpGet("https://raw.githubusercontent.com/frel0/notoriety-autowin/main/heists/shadow-raid.lua"))();
 ]])
 
-wait(0.1)
+wait(0.15)
 -- start game
 replicatedstorage.StartGame:FireServer(replicatedstorage.Lobbies[game.Players.LocalPlayer.DisplayName])
 
