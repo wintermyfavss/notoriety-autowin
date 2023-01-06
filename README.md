@@ -23,7 +23,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/frel0/notoriety-autow
 
 1. Make sure you are in the lobby, not in-game.
 2. Execute the script.
-3. boom, youre done.
+3. boom, youre done. (dont click anything, it will do everything for you.)
 
 #### Will this get me banned?
 
