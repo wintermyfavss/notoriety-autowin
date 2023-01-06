@@ -1,3 +1,4 @@
+wait(2)
 -- this is by far my shittiest code ever made.
 local replicatedstorage = game:GetService("ReplicatedStorage")
 
