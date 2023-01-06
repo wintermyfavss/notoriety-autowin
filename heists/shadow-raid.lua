@@ -29,7 +29,7 @@ end
 end)
 
 task.spawn(function()
-	wait(13)
+	wait(6.4)
 for i,v in pairs(getconnections(game:GetService("Players").LocalPlayer.PlayerGui["SG_Package"].MainGui.PregameFrame["button_playerReady"].MouseButton1Click)) do
    v.Function()
 end
