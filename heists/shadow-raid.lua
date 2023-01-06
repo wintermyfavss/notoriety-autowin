@@ -29,7 +29,7 @@ end
 end)
 
 task.spawn(function()
-	wait(6.4)
+wait(3.5)
 for i,v in pairs(getconnections(game:GetService("Players").LocalPlayer.PlayerGui["SG_Package"].MainGui.PregameFrame["button_playerReady"].MouseButton1Click)) do
    v.Function()
 end
@@ -38,7 +38,7 @@ end)
 task.spawn(function()
 while task.wait() do
 if game:GetService("Players").LocalPlayer.PlayerGui["SG_Package"].MainGui["frame_heistResults"].Visible then
-wait(2)
+wait(2.5)
 game:GetService("TeleportService"):Teleport(21532277, game.Players.LocalPlayer)
 end
 end
