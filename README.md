@@ -2,6 +2,8 @@
 
 An Open-Source Script that basically finishes one heist in around 15 to 18 seconds.
 
+You should get 90M cash every 15 minutes, if you put this into the auto-execute folder.
+
 ## Source
 
  - [Shadow Raid Heist](https://raw.githubusercontent.com/frel0/notoriety-autowin/main/heists/shadow-raid.lua)
