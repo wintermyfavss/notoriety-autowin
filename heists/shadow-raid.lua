@@ -1,3 +1,5 @@
+-- i might make a recode, because this code is fuckin terrible.
+
 task.spawn(function()
 	while task.wait() do
 		for i,v in pairs(game:GetService("Workspace").Bags:GetDescendants()) do
