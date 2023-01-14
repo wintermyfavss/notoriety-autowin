@@ -1,3 +1,5 @@
+wait(4) -- game got an update and i dont know how else to fix it
+
 -- Secure bags automatically
 task.spawn(function()
 	while task.wait() do
