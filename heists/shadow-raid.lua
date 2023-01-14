@@ -1,4 +1,4 @@
-if game:GetService("Players").LocalPlayer.PlayerGui["SG_Package"].MainGui["frame_loading"].Visible == false then
+if game:IsLoaded() then
 -- Secure bags automatically
 task.spawn(function()
 	while task.wait() do
