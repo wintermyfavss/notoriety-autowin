@@ -1,3 +1,5 @@
+queue_on_teleport = queue_on_teleport or syn.queue_on_teleport
+
 wait(2.64)
 -- this is by far my shittiest code ever made.
 local replicatedstorage = game:GetService("ReplicatedStorage")
