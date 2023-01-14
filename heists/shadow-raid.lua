@@ -1,5 +1,4 @@
-wait(4) -- game got an update and i dont know how else to fix it
-
+if game:GetService("Players").LocalPlayer.PlayerGui["SG_Package"].MainGui["frame_loading"].Visible == false then
 -- Secure bags automatically
 task.spawn(function()
 	while task.wait() do
@@ -56,3 +55,4 @@ task.spawn(function()
     end
 end
 end)
+end
