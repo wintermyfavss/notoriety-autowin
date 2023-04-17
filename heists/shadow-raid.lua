@@ -1,3 +1,5 @@
+print("info 1")
+
 if game:IsLoaded() then
 -- Secure bags automatically
 task.spawn(function()
@@ -56,3 +58,5 @@ task.spawn(function()
 end
 end)
 end
+
+print("info 2")
