@@ -36,6 +36,6 @@ else
         wait(0.15)
 
         -- Start game
-        replicatedstorage.StartGame:FireServer(replicatedstorage.Lobbies[players.LocalPlayer.DisplayName])
+        replicatedstorage.StartGame:FireServer(replicatedstorage.Lobbies[game.Players.LocalPlayer.DisplayName])
     end
 end
