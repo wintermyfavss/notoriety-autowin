@@ -1,27 +1,36 @@
-queue_on_teleport = queue_on_teleport or syn.queue_on_teleport
-
-wait(2.64)
--- this is by far my shittiest code ever made.
+wait(4)
 local replicatedstorage = game:GetService("ReplicatedStorage")
 
--- if player is in a lobby, leave it.
+-- Leave lobby if already in one
 if replicatedstorage.Lobbies:FindFirstChild(game.Players.LocalPlayer.DisplayName) then
-replicatedstorage.LeaveLobby:FireServer(replicatedstorage.Lobbies[game.Players.LocalPlayer.DisplayName])
+    replicatedstorage.LeaveLobby:FireServer(replicatedstorage.Lobbies[game.Players.LocalPlayer.DisplayName])
 end
 
 if shared.Heist == "Shadow Raid" then
--- SHADOW RAID START
+    -- Create Shadow Raid lobby
+    replicatedstorage.MakeLobby:InvokeServer(
+        "Shadow Raid",      -- Heist
+        "Nightmare",        -- Difficulty
+        1,                  -- Contract Type
+        "PUBLIC",           -- Lobby Type
+        "Stealth",          -- Loud or Stealth
+        false,              -- Contract Booster
+        false,              -- Contract Modifier
+        1,                  -- Preferred Player Count
+        false,              -- Solo Contract
+        false,              -- Rejoinable
+        {}                  -- Friends Only
+    )
 
--- create shadow raid lobby
-replicatedstorage.MakeLobby:InvokeServer("Shadow Raid", "Nightmare", 1, "PUBLIC", "Stealth", false, false, 1, false, false, {})
+    -- Queue on teleport and load Shadow Raid script
+    if syn and syn.queue_on_teleport then
+        syn.queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/frel0/notoriety-autowin/main/heists/shadow-raid.lua'))()")
+    elseif queue_on_teleport then
+        queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/frel0/notoriety-autowin/main/heists/shadow-raid.lua'))()")
+    end
 
-queue_on_teleport([[
-loadstring(game:HttpGet("https://raw.githubusercontent.com/frel0/notoriety-autowin/main/heists/shadow-raid.lua"))();
-]])
+    wait(0.15)
 
-wait(0.15)
--- start game
-replicatedstorage.StartGame:FireServer(replicatedstorage.Lobbies[game.Players.LocalPlayer.DisplayName])
-
--- SHADOW RAID END
+    -- Start game
+    replicatedstorage.StartGame:FireServer(replicatedstorage.Lobbies[game.Players.LocalPlayer.DisplayName])
 end
