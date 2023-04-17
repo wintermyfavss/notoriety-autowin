@@ -13,6 +13,7 @@ You should get 90M cash every 15 minutes, if you put this into the auto-execute 
 
 ```lua
 shared.Heist = "Shadow Raid"
+shared.DenyIfMaxLevel = false
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/frel0/notoriety-autowin/main/main.lua"))();
 ```
@@ -28,3 +29,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/frel0/notoriety-autow
 #### Will this get me banned?
 
 No.
+
+#### What does DenyIfMaxLevel do?
+
+If your level is 100 (max level), the auto-win will stop so you can do a rebirth or whatever the hell u wanna do
