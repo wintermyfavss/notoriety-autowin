@@ -1,5 +1,5 @@
 print("info 1")
-
+wait(4) --things might get broken if this aint here.
 if game:IsLoaded() then
     -- Secure bags automatically
     coroutine.wrap(function()
