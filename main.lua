@@ -12,7 +12,7 @@ if playerLevel == 100 and shared.DenyIfMaxLevel == true then
 else
     if shared.Heist == "Shadow Raid" then
         -- Create Shadow Raid lobby
-        replicatedStorage.MakeLobby:InvokeServer(
+        replicatedstorage.MakeLobby:InvokeServer(
             "Shadow Raid",      -- Heist
             "Nightmare",        -- Difficulty
             1,                  -- Contract Type
@@ -36,6 +36,6 @@ else
         wait(0.15)
 
         -- Start game
-        replicatedStorage.StartGame:FireServer(replicatedStorage.Lobbies[players.LocalPlayer.DisplayName])
+        replicatedstorage.StartGame:FireServer(replicatedstorage.Lobbies[players.LocalPlayer.DisplayName])
     end
 end
