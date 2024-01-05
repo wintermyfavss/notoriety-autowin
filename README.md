@@ -1,5 +1,5 @@
 # Notoriety Auto "Win"
-
+- Discontinued
 An Open-Source Script that basically finishes one heist in around 23 to 28 seconds.
 
 You should get 90M cash every 15 minutes, if you put this into the auto-execute folder.
