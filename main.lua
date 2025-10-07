@@ -28,9 +28,9 @@ else
 
         -- Queue on teleport and load Shadow Raid script
         if syn and syn.queue_on_teleport then
-            syn.queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/frel0/notoriety-autowin/main/heists/shadow-raid.lua'))()")
+            syn.queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/wintermyfavss/notoriety-autowin/main/heists/shadow-raid.lua'))()")
         elseif queue_on_teleport then
-            queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/frel0/notoriety-autowin/main/heists/shadow-raid.lua'))()")
+            queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/wintermyfavss/notoriety-autowin/main/heists/shadow-raid.lua'))()")
         end
 
         wait(0.15)
