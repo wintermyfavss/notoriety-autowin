@@ -3,26 +3,25 @@ wait(4)
 
 if game:IsLoaded() then
     local HRP = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart
-    local Remotes = game:GetService("ReplicatedStorage").RS_Package.Remotes 
+    local Remotes = game:GetService("ReplicatedStorage").RS_Package.Remotes -- เพิ่ม Remotes เข้ามา
     local BagSecurePosition = game:GetService("Workspace").BagSecuredArea.FloorPart.Position
+    local Player = game:GetService("Players").LocalPlayer
 
-    -- **ลบโค้ด Instant Loot (ProximityPrompt HoldDuration = 0) และโค้ด Click Ready ที่ไม่เกี่ยวข้องกับการ Loot ออกไป**
-
-    -- Auto-win code (Auto-Loot, Auto-Throw, Teleport)
+    -- Auto-win code (จัดการ Loot และ Auto-Throw ตามจังหวะเวลา)
     coroutine.wrap(function()
-        
-        -- *** ปรับเวลา Loot และ Throw ที่สำคัญ ***
-        local LootDuration = 4 -- เวลาที่ใช้ Loot จริง ๆ (ลองเริ่มที่ 2.5 วินาที)
-        local ThrowWaitTime = 1.0 -- เวลาให้เซิร์ฟเวอร์ประมวลผลการ Throw
+        -- กำหนดเวลา Looting และ Securing ด้วยมือ (สามารถปรับได้ตามความเหมาะสม)
+        local LootWaitTime = 5 -- เวลาให้ผู้เล่น Loot ด้วยมือ
+        local ThrowWaitTime = 2 -- เวลาหน่วงเพื่อให้เซิร์ฟเวอร์ประมวลผลการ Throw
 
         while true do 
             
-            local lootFound = false
-            
             -- ---------------------------------
-            -- 1. AUTO-LOOT (Start -> Wait -> Complete)
+            -- 1. TELEPORT TO LOOT ชิ้นถัดไป
             -- ---------------------------------
 
+            local lootFound = false
+            
+            -- ค้นหาและ Teleport ไปยัง Loot Item ที่ยังไม่ถูก Loot
             for _, v in pairs(game.Workspace.BigLoot:GetDescendants()) do
                 local prompt = v:FindFirstChildOfClass("ProximityPrompt")
 
@@ -30,31 +29,22 @@ if game:IsLoaded() then
 
                     -- A. Teleport ไปที่ Loot Item
                     HRP.CFrame = CFrame.new(v.Position)
-                    wait(0.1) 
-                    
-                    -- B. สั่งเริ่มปฏิสัมพันธ์ (Start Interaction)
-                    print("Info: Starting Auto-Loot Interaction...")
-                    Remotes.StartInteraction:FireServer(prompt)
-                    
-                    -- C. รอเวลา Loot (เลียนแบบการกดค้าง)
-                    wait(LootDuration) 
-                    
-                    -- D. สั่งเสร็จสิ้นปฏิสัมพันธ์ (Complete Interaction)
-                    Remotes.CompleteInteraction:FireServer(prompt)
-                    
-                    print("Info: Looting Complete. Should have bag now.")
+                    print("Info: Teleported to Loot. Please manually steal the item.")
                     lootFound = true
                     
-                    -- ออกจากลูปหา Loot และไปขั้นตอน Securing
-                    break 
+                    -- B. รอให้ผู้เล่นมีเวลา Loot ด้วยมือ (Looting Bar เต็ม)
+                    wait(LootWaitTime) 
+                    
+                    break -- วาร์ปไปที่ชิ้นแรกแล้วออกจากลูปหา Loot
                 end
             end
-
+            
             -- ---------------------------------
             -- 2. AUTO-THROW BAG (สันนิษฐานว่า Loot สำเร็จแล้ว)
             -- ---------------------------------
 
             if lootFound then 
+                -- หากมีการวาร์ปไป Loot ในขั้นตอนที่ 1 (สันนิษฐานว่า Loot สำเร็จแล้ว)
                 
                 -- A. Teleport ไปยังพื้นที่ Secure Area (รถตู้)
                 HRP.CFrame = CFrame.new(BagSecurePosition)
@@ -74,15 +64,31 @@ if game:IsLoaded() then
             -- ---------------------------------
             
             if not lootFound then
-                wait(5) -- ถ้าหา Loot ไม่พบ ให้รอ 10 วินาทีก่อนเริ่มหาใหม่
+                wait(10) -- ถ้าหา Loot ไม่พบ ให้รอ 10 วินาทีก่อนเริ่มหาใหม่
             end
-            
-            wait(0.5)
         end
     end)()
 
-    -- (ต้องนำส่วน Click the "ready" button และ If heist results appear, teleport back to lobby มาใส่ด้วย)
+    -- Click the "ready" button 
+    coroutine.wrap(function()
+        while wait() do
+            if game:GetService("ReplicatedStorage")["RS_Package"].ReplicatedGameStatus.BagsSecured.Value > 10 then
+                for _, v in pairs(getconnections(game:GetService("Players").LocalPlayer.PlayerGui["SG_Package"].MainGui.PregameFrame["button_playerReady"].MouseButton1Click)) do
+                    v.Function()
+                end
+            end
+        end
+    end)()
 
+    -- If heist results appear, teleport back to lobby 
+    coroutine.wrap(function()
+        while wait() do
+            if game:GetService("Players").LocalPlayer.PlayerGui["SG_Package"].MainGui["frame_heistResults"].Visible then
+                wait(2.5)
+                game:GetService("TeleportService"):Teleport(21532277, game.Players.LocalPlayer)
+            end
+        end
+    end)()
 end
 
 print("info 2")
