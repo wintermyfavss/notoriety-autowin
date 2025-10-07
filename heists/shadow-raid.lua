@@ -5,73 +5,65 @@ if game:IsLoaded() then
     local HRP = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart
     local Remotes = game:GetService("ReplicatedStorage").RS_Package.Remotes 
     local BagSecurePosition = game:GetService("Workspace").BagSecuredArea.FloorPart.Position
-    local TweenService = game:GetService("TweenService") 
+    local Player = game:GetService("Players").LocalPlayer
 
-    -- ฟังก์ชันสำหรับ Tween ตัวละคร (เคลื่อนที่นุ่มนวล)
-    local function tweenToPosition(targetPosition)
-        local tweenInfo = TweenInfo.new(
-            1.5, -- ใช้เวลา 0.5 วินาทีในการเคลื่อนที่
-            Enum.EasingStyle.Quad,
-            Enum.EasingDirection.Out
-        )
-        local goal = {CFrame = CFrame.new(targetPosition)}
-        local tween = TweenService:Create(HRP, tweenInfo, goal)
-        tween:Play()
-        tween.Completed:Wait() -- รอจนกว่าการเคลื่อนที่เสร็จสมบูรณ์
-    end
-
-    -- Auto-win code (Auto-Loot และ Auto-Move)
+    -- Auto-win code (จัดการ Loot และ Auto-Throw ตามจังหวะเวลา)
     coroutine.wrap(function()
-        
-        -- ปรับเวลา Loot ที่สำคัญ
-        local LootDuration = 6.5 -- ***ลองปรับค่านี้หากยังเกิด Cancel Interaction***
+        -- กำหนดเวลา Looting และ Securing 
+        local LootWaitTime = 2 -- **หน่วงเวลา 4 วินาที** (ระหว่าง Teleport/Loot กับ Auto-Throw)
+        local ThrowWaitTime = 1 -- เวลาหน่วงเพื่อให้เซิร์ฟเวอร์ประมวลผลการ Throw
 
         while true do 
             
             local lootFound = false
             
             -- ---------------------------------
-            -- 1. AUTO-LOOT (Tween -> Start -> Wait -> Complete)
+            -- 1. QUICK & DIRTY TELEPORT, COMPLETE INTERACTION และ Auto-Throw
             -- ---------------------------------
-
+            
+            -- ค้นหาทุกอย่างใน BigLoot และวาร์ปไปที่ทุกชิ้นส่วนทันที
             for _, v in pairs(game.Workspace.BigLoot:GetDescendants()) do
-                local prompt = v:FindFirstChildOfClass("ProximityPrompt")
+                
+                -- *ไม่มีการตรวจสอบ ProximityPrompt*
+                if v:IsA("Part") then
 
-                if v:IsA("Part") and prompt then
-
-                    -- A. TWEEN ไปที่ Loot Item
-                    print("Info: Tweening to Loot position...")
-                    tweenToPosition(v.Position) 
-                    wait(0.1) 
+                    -- A. Teleport ไปที่ Loot Item ทุกชิ้น
+                    HRP.CFrame = CFrame.new(v.Position)
+                    print("Info: Quick-Teleported to Loot position.")
                     
-                    -- B. สั่งเริ่มปฏิสัมพันธ์ (Start Interaction)
-                    print("Info: Starting Auto-Loot Interaction...")
-                    Remotes.StartInteraction:FireServer(prompt)
+                    -- B. สั่ง CompleteInteraction ทันที (Quick & Dirty Loot)
+                    -- เราต้องหา ProximityPrompt ที่ใกล้ที่สุดเพื่อใช้เป็น Argument
+                    local prompt = v:FindFirstChildOfClass("ProximityPrompt") 
+                    if prompt then
+                        print("Info: Firing CompleteInteraction...")
+                        Remotes.CompleteInteraction:FireServer(prompt)
+                    else
+                        -- ถ้าไม่มี Prompt อยู่ อาจเป็น Loot ที่ถูกเก็บไปแล้ว แต่เรายังวาร์ปไป
+                        print("Warning: No ProximityPrompt found, still proceeding.")
+                    end
                     
-                    -- C. รอเวลา Loot ที่สมจริง
-                    wait(LootDuration) 
                     
-                    -- D. สั่งเสร็จสิ้นปฏิสัมพันธ์ (Complete Interaction)
-                    Remotes.CompleteInteraction:FireServer(prompt)
+                    -- C. หน่วงเวลา 4 วินาที (ให้ Loot สำเร็จ/เซิร์ฟเวอร์ประมวลผล)
+                    wait(LootWaitTime) 
                     
-                    print("Info: Looting Complete.")
                     lootFound = true
-                    break 
+                    
+                    -- ---------------------------------
+                    -- 2. AUTO-THROW BAG (ทำทันทีหลังรอ 4 วินาที)
+                    -- ---------------------------------
+                    
+                    -- A. Teleport ไปยังพื้นที่ Secure Area (รถตู้)
+                    HRP.CFrame = CFrame.new(BagSecurePosition)
+                    wait(0.2)
+                    
+                    print("Info: Teleported to Van. Auto-Throwing Bag...")
+
+                    -- B. สั่ง ThrowBag ทันที
+                    Remotes.ThrowBag:FireServer(Vector3.new(0.005740683991461992, -0.019172538071870804, -0.9997996687889099))
+                    
+                    -- C. หน่วงเวลาเพื่อให้เซิร์ฟเวอร์ประมวลผลการ Throw
+                    wait(ThrowWaitTime) 
                 end
-            end
-
-            -- ---------------------------------
-            -- 2. AUTO-MOVE TO VAN (Manual Throw Required)
-            -- ---------------------------------
-
-            if lootFound then 
-                
-                -- A. TWEEN ไปยังพื้นที่ Secure Area (รถตู้)
-                tweenToPosition(BagSecurePosition)
-                print("Loot Status: Item secured. Tweened to Van. Please MANUALLY THROW the bag!")
-                
-                -- B. หน่วงเวลาเล็กน้อยเพื่อให้คุณโยนกระเป๋า
-                wait(3) 
             end
             
             -- ---------------------------------
@@ -81,7 +73,8 @@ if game:IsLoaded() then
             if not lootFound then
                 wait(10) -- ถ้าหา Loot ไม่พบ ให้รอ 10 วินาทีก่อนเริ่มหาใหม่
             else
-                wait(0.5) -- ถ้า Loot สำเร็จ ให้รีบวนลูปเพื่อหา Loot ชิ้นต่อไป
+                -- ถ้ามีการ Loot เกิดขึ้น ให้หน่วงเวลาเล็กน้อยก่อนเริ่มลูปใหม่ทั้งหมด
+                wait(0.5)
             end
         end
     end)()
