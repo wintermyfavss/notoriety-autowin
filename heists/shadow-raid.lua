@@ -15,7 +15,7 @@ if game:IsLoaded() then
             -- ---------------------------------
             
             -- ***ตรวจสอบว่าผู้เล่นถือ 'LootBag' อยู่หรือไม่***
-            if HRP.Parent:FindFirstChild("LootBag") then
+            if HRP.Parent:FindFirstChild("MoneyBag") then
                 
                 -- A. Teleport ไปยังพื้นที่ Secure Area (รถตู้)
                 HRP.CFrame = CFrame.new(BagSecurePosition)
@@ -25,7 +25,7 @@ if game:IsLoaded() then
                 -- B. รอจนกว่ากระเป๋าจะถูกโยนออกไป
                 repeat wait() 
                     -- วนลูปจนกว่าผู้เล่นจะไม่มี 'LootBag' ในมือแล้ว
-                until not HRP.Parent:FindFirstChild("LootBag") or not HRP.Parent or not HRP.Parent.Parent
+                until not HRP.Parent:FindFirstChild("MoneyBag") or not HRP.Parent or not HRP.Parent.Parent
                 
                 print("Info: Bag Secured. Looking for next Loot...")
                 
