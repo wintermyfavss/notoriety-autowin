@@ -36,7 +36,7 @@ if game:IsLoaded() then
     coroutine.wrap(function()
         -- กำหนดเวลา Looting และ Securing ด้วยมือ (สามารถปรับได้ตามความเหมาะสม)
         -- *** หาก Loot Bar หายไปแล้ว (Instant Loot ทำงาน) ให้ลดเวลาเหล่านี้ลงได้ ***
-        local LootWaitTime = 0.5 -- ลดเวลาลงเหลือ 0.5 วินาที หลัง Instant Loot
+        local LootWaitTime = 2 -- ลดเวลาลงเหลือ 0.5 วินาที หลัง Instant Loot
         local ThrowWaitTime = 1  -- เวลาหน่วงเพื่อให้เซิร์ฟเวอร์ประมวลผลการ Throw
 
         while true do 
