@@ -9,7 +9,7 @@ if game:IsLoaded() then
 
     -- Auto-win code
     coroutine.wrap(function()
-        while wait(0.5) do
+        while wait(2.5) do
             
             -- ---------------------------------
             -- 1. TELEPORT TO LOOT (MANUAL LOOT)
@@ -28,6 +28,7 @@ if game:IsLoaded() then
                     HRP.CFrame = CFrame.new(v.Position)
                     print("Info: Teleported to Loot. Please manually steal the item.")
                     lootTeleported = true
+               wait(5)
                     break -- Teleport ไปยังชิ้นแรกแล้วออกไปรอ
                 end
             end
