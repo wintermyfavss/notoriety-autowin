@@ -18,7 +18,7 @@ You should get 90M cash every 15 minutes, if you put this into the auto-execute 
 shared.Heist = "Shadow Raid"
 shared.DenyIfMaxLevel = false
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/frel0/notoriety-autowin/main/main.lua"))();
+loadstring(game:HttpGet("https://raw.githubusercontent.com/wintermyfavss/notoriety-autowin/main/main.lua"))();
 ```
 
 ## FAQ
