@@ -10,7 +10,7 @@ if game:IsLoaded() then
     -- Auto-win code (จัดการ Loot และ Auto-Throw ตามจังหวะเวลา)
     coroutine.wrap(function()
         -- กำหนดเวลา Looting และ Securing ด้วยมือ (สามารถปรับได้ตามความเหมาะสม)
-        local LootWaitTime = 4 -- เวลาให้ผู้เล่น Loot ด้วยมือ
+        local LootWaitTime = 4 -- เวลาให้ผู้เล่น Loot ด้วยมือ (อาจถูกลดเหลือ 0 ถ้า Auto-Loot สำเร็จ)
         local ThrowWaitTime = 1 -- เวลาหน่วงเพื่อให้เซิร์ฟเวอร์ประมวลผลการ Throw
 
         while true do 
@@ -29,10 +29,20 @@ if game:IsLoaded() then
 
                     -- A. Teleport ไปที่ Loot Item
                     HRP.CFrame = CFrame.new(v.Position)
-                    print("Info: Teleported to Loot. Please manually steal the item.")
+                    print("Info: Teleported to Loot. Testing Quick & Dirty Auto-Loot...")
                     lootFound = true
                     
-                    -- B. รอให้ผู้เล่นมีเวลา Loot ด้วยมือ (Looting Bar เต็ม)
+                    -- ********** ส่วน Quick and Dirty Auto-Loot **********
+                    -- พยายามสั่ง Loot ด้วยวิธีเก่าทันทีที่วาร์ปถึง
+                    for _, loot_prompt in pairs(workspace:GetDescendants()) do
+                        if loot_prompt:IsA("ProximityPrompt") then
+                            -- คำสั่งโกงเพื่อสั่งปฏิสัมพันธ์
+                            fireproximityprompt(loot_prompt) 
+                        end
+                    end
+                    -- ***************************************************
+
+                    -- B. รอเวลาที่กำหนด (หาก Auto-Loot สำเร็จ เวลาส่วนนี้จะถูกใช้เป็นบัฟเฟอร์)
                     wait(LootWaitTime) 
                     
                     break -- วาร์ปไปที่ชิ้นแรกแล้วออกจากลูปหา Loot
