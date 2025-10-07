@@ -3,38 +3,20 @@ wait(4)
 
 if game:IsLoaded() then
     local HRP = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart
+    local Remotes = game:GetService("ReplicatedStorage").RS_Package.Remotes -- เพิ่ม Remotes เข้ามา
     local BagSecurePosition = game:GetService("Workspace").BagSecuredArea.FloorPart.Position
     local Player = game:GetService("Players").LocalPlayer
 
-    -- Auto-win code (จัดการ Loot และ Secure ตามลำดับ Inventory)
+    -- Auto-win code (จัดการ Loot และ Auto-Throw ตามจังหวะเวลา)
     coroutine.wrap(function()
-        while true do 
+        -- กำหนดเวลา Looting และ Securing ด้วยมือ (สามารถปรับได้ตามความเหมาะสม)
+        local LootWaitTime = 5 -- เวลาให้ผู้เล่น Loot ด้วยมือ
+        local ThrowWaitTime = 2 -- เวลาหน่วงเพื่อให้เซิร์ฟเวอร์ประมวลผลการ Throw
 
-            -- ---------------------------------
-            -- 1. SECURE กระเป๋าที่ถืออยู่ก่อน (ความสำคัญสูงสุด)
-            -- ---------------------------------
-            
-            -- ***ตรวจสอบว่าผู้เล่นถือ 'LootBag' อยู่หรือไม่***
-            if HRP.Parent:FindFirstChild("MoneyBag") then
-                
-                -- A. Teleport ไปยังพื้นที่ Secure Area (รถตู้)
-                HRP.CFrame = CFrame.new(BagSecurePosition)
-                print("Info: Teleported to Van. Please manually throw the bag.")
-                wait(0.2)
-                
-                -- B. รอจนกว่ากระเป๋าจะถูกโยนออกไป
-                repeat wait() 
-                    -- วนลูปจนกว่าผู้เล่นจะไม่มี 'LootBag' ในมือแล้ว
-                until not HRP.Parent:FindFirstChild("MoneyBag") or not HRP.Parent or not HRP.Parent.Parent
-                
-                print("Info: Bag Secured. Looking for next Loot...")
-                
-                -- หน่วงเวลาเล็กน้อยก่อนไปหา Loot ใหม่
-                wait(1) 
-            end
+        while true do 
             
             -- ---------------------------------
-            -- 2. TELEPORT TO LOOT ชิ้นถัดไป
+            -- 1. TELEPORT TO LOOT ชิ้นถัดไป
             -- ---------------------------------
 
             local lootFound = false
@@ -43,7 +25,6 @@ if game:IsLoaded() then
             for _, v in pairs(game.Workspace.BigLoot:GetDescendants()) do
                 local prompt = v:FindFirstChildOfClass("ProximityPrompt")
 
-                -- ตรวจสอบว่ามี Prompt อยู่หรือไม่ (แสดงว่ายัง Loot ไม่เสร็จ)
                 if v:IsA("Part") and prompt then
 
                     -- A. Teleport ไปที่ Loot Item
@@ -51,11 +32,31 @@ if game:IsLoaded() then
                     print("Info: Teleported to Loot. Please manually steal the item.")
                     lootFound = true
                     
-                    -- B. รอให้ผู้เล่นมีเวลา Loot ด้วยมือ
-                    wait(4) 
+                    -- B. รอให้ผู้เล่นมีเวลา Loot ด้วยมือ (Looting Bar เต็ม)
+                    wait(LootWaitTime) 
                     
                     break -- วาร์ปไปที่ชิ้นแรกแล้วออกจากลูปหา Loot
                 end
+            end
+            
+            -- ---------------------------------
+            -- 2. AUTO-THROW BAG (สันนิษฐานว่า Loot สำเร็จแล้ว)
+            -- ---------------------------------
+
+            if lootFound then 
+                -- หากมีการวาร์ปไป Loot ในขั้นตอนที่ 1 (สันนิษฐานว่า Loot สำเร็จแล้ว)
+                
+                -- A. Teleport ไปยังพื้นที่ Secure Area (รถตู้)
+                HRP.CFrame = CFrame.new(BagSecurePosition)
+                wait(0.2)
+                
+                print("Info: Teleported to Van. Auto-Throwing Bag...")
+
+                -- B. สั่ง ThrowBag ทันที
+                Remotes.ThrowBag:FireServer(Vector3.new(0.005740683991461992, -0.019172538071870804, -0.9997996687889099))
+                
+                -- C. หน่วงเวลาเพื่อให้เซิร์ฟเวอร์ประมวลผลการ Throw
+                wait(ThrowWaitTime) 
             end
             
             -- ---------------------------------
@@ -63,7 +64,7 @@ if game:IsLoaded() then
             -- ---------------------------------
             
             if not lootFound then
-                wait(5)
+                wait(10) -- ถ้าหา Loot ไม่พบ ให้รอ 10 วินาทีก่อนเริ่มหาใหม่
             end
         end
     end)()
