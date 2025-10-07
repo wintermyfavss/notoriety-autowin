@@ -24,7 +24,7 @@ if game:IsLoaded() then
     coroutine.wrap(function()
         
         -- ปรับเวลา Loot และ Throw ที่สำคัญ
-        local LootDuration = 3.5 -- ***ลองเริ่มที่ 3.5 วินาที (จากประสบการณ์ก่อนหน้า)***
+        local LootDuration = 5.4 -- ***ลองเริ่มที่ 3.5 วินาที (จากประสบการณ์ก่อนหน้า)***
         local ThrowWaitTime = 1.5 -- เวลาให้เซิร์ฟเวอร์ประมวลผลการ Throw
 
         while true do 
