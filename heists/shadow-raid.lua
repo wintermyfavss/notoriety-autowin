@@ -10,8 +10,8 @@ if game:IsLoaded() then
     -- Auto-win code (จัดการ Loot และ Auto-Throw ตามจังหวะเวลา)
     coroutine.wrap(function()
         -- กำหนดเวลา Looting และ Securing ด้วยมือ (สามารถปรับได้ตามความเหมาะสม)
-        local LootWaitTime = 5 -- เวลาให้ผู้เล่น Loot ด้วยมือ
-        local ThrowWaitTime = 2 -- เวลาหน่วงเพื่อให้เซิร์ฟเวอร์ประมวลผลการ Throw
+        local LootWaitTime = 4 -- เวลาให้ผู้เล่น Loot ด้วยมือ
+        local ThrowWaitTime = 1 -- เวลาหน่วงเพื่อให้เซิร์ฟเวอร์ประมวลผลการ Throw
 
         while true do 
             
