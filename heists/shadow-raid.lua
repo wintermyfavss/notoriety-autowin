@@ -28,11 +28,29 @@ if game:IsLoaded() then
             wait(0.2)
 
             -- Fire proximity prompt
-            for _, v in pairs(workspace:GetDescendants()) do
-                if v:IsA("ProximityPrompt") then
-                    fireproximityprompt(v)
-                end
-            end
+            local Remotes = game:GetService("ReplicatedStorage").RS_Package.Remotes
+
+-- ค้นหาและ Loot ไอเทมทั้งหมดในพื้นที่
+for _, v in pairs(game:GetService("Workspace").BigLoot:GetDescendants()) do -- BigLoot คือโฟลเดอร์ที่มีของมีค่า
+    local prompt = v:FindFirstChildOfClass("ProximityPrompt") -- มองหา ProximityPrompt ในวัตถุ Loot
+    
+    if prompt then
+        
+        -- 1. เริ่มการปฏิสัมพันธ์ (Start Interaction)
+        -- จำลองการกดปุ่ม (ProximityPrompt) ด้วยการยิง StartInteraction
+        Remotes.StartInteraction:FireServer(prompt)
+        
+        -- 2. รอ (Wait) ให้ Loot เสร็จสมบูรณ์
+        -- หาก Loot ใช้เวลา 20-30 วินาทีตามที่ระบุในคำถามแรก 
+        -- สคริปต์ต้องรอหรือหลอกเซิร์ฟเวอร์ว่า Loot เสร็จแล้ว
+        wait(2.5) -- ลองรอแค่ 2.5 วินาที เพื่อดูว่าพอหรือไม่
+        
+        -- 3. สิ้นสุดการปฏิสัมพันธ์ (Complete Interaction)
+        -- สั่งให้เซิร์ฟเวอร์นับว่าการ Loot เสร็จสมบูรณ์แล้ว
+        Remotes.CompleteInteraction:FireServer(prompt)
+    end
+end
+
 
             wait(0.01)
 
