@@ -29,8 +29,8 @@ if game:IsLoaded() then
                     -- B. เริ่มการ Loot (Start Interaction)
                     Remotes.StartInteraction:FireServer(prompt)
 
-                    -- C. Bypass Loot Time (ลองใช้ 0.5 วินาที)
-                    wait(0.5) 
+                    -- C. Bypass Loot Time (ลองใช้ 2.5 วินาที)
+                    wait(2.5) 
 
                     -- D. เสร็จสิ้นการ Loot (Complete Interaction)
                     Remotes.CompleteInteraction:FireServer(prompt)
