@@ -2,38 +2,32 @@ print("info 1")
 wait(4)
 
 if game:IsLoaded() then
+    
+    -- *************************************************************
+    -- ** NEW: Instant Interact Setup (ใช้ fireproximityprompt) **
+    -- *************************************************************
+    local ProximityPromptService = game:GetService("ProximityPromptService")
+    local instantInteractEnabled = true
+
+    ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt, player)
+        if instantInteractEnabled then
+            -- สั่งให้ Prompt ทำงานทันทีเมื่อเริ่มกดปุ่มค้าง
+            fireproximityprompt(prompt) 
+        end
+    end)
+    print("Info: Instant Interact (fireproximityprompt) is now active.")
+    -- *************************************************************
+
     local HRP = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart
-    local Remotes = game:GetService("ReplicatedStorage").RS_Package.Remotes
+    local Remotes = game:GetService("ReplicatedStorage").RS_Package.Remotes -- เพิ่ม Remotes เข้ามา
     local BagSecurePosition = game:GetService("Workspace").BagSecuredArea.FloorPart.Position
     local Player = game:GetService("Players").LocalPlayer
 
-    -- *************************************************************
-    -- ** NEW: Interact Aura (Instant Loot) - ทำงานวนลูปตลอดเวลา **
-    -- *************************************************************
+    -- Auto-win code (จัดการ Loot และ Auto-Throw ตามจังหวะเวลา)
     coroutine.wrap(function()
-        print("Info: Interact Aura running...")
-        while true do
-            for i, v in pairs(game.Workspace:GetDescendants()) do
-                if v:IsA("ProximityPrompt") then
-                    local args = {
-                        [1] = v
-                    }
-                    
-                    -- สั่ง Start และ Complete ทันที (Instant Loot)
-                    game:GetService("ReplicatedStorage").RS_Package.Remotes.StartInteraction:FireServer(unpack(args))
-                    game:GetService("ReplicatedStorage").RS_Package.Remotes.CompleteInteraction:FireServer(unpack(args))
-                end
-            end
-            -- หน่วงเวลาเล็กน้อยเพื่อให้การทำงานไม่ถี่จนเกินไป
-            wait(0.05) 
-        end
-    end)()
-    -- *************************************************************
-    
-    -- Auto-win code (จัดการ Teleport และ Auto-Throw)
-    coroutine.wrap(function()
-        local LootWaitTime = 5 
-        local ThrowWaitTime = 1 
+        -- กำหนดเวลา Looting และ Securing ด้วยมือ (สามารถปรับได้ตามความเหมาะสม)
+        local LootWaitTime = 2.0 -- ลดเวลารอ เพราะ Loot จะสำเร็จทันทีที่คุณกดปุ่ม
+        local ThrowWaitTime = 1 -- เวลาหน่วงเพื่อให้เซิร์ฟเวอร์ประมวลผลการ Throw
 
         while true do 
             
@@ -43,21 +37,21 @@ if game:IsLoaded() then
 
             local lootFound = false
             
-            -- ค้นหาและ Teleport ไปยัง Loot Item ที่ยังมี Prompt (Interact Aura จะพยายาม Loot ให้แล้ว)
+            -- ค้นหาและ Teleport ไปยัง Loot Item ที่ยังไม่ถูก Loot
             for _, v in pairs(game.Workspace.BigLoot:GetDescendants()) do
                 local prompt = v:FindFirstChildOfClass("ProximityPrompt")
 
                 if v:IsA("Part") and prompt then
 
-                    -- A. Teleport ไปที่ Loot Item (เพื่อให้ Interact Aura ที่รันอยู่ใกล้ Prompt)
+                    -- A. Teleport ไปที่ Loot Item
                     HRP.CFrame = CFrame.new(v.Position)
-                    print("Info: Teleported to Loot position. Aura should be looting now.")
+                    print("Info: Teleported to Loot. **Press Interact Button (e.g., 'E') to Instant Loot.**")
                     lootFound = true
                     
-                    -- B. รอให้ Aura ทำงานและ Loot สำเร็จ
+                    -- B. รอเวลาสั้นๆ (0.5 วินาที) เพื่อให้คุณกดปุ่ม Interact
                     wait(LootWaitTime) 
                     
-                    break 
+                    break -- วาร์ปไปที่ชิ้นแรกแล้วออกจากลูปหา Loot
                 end
             end
             
@@ -66,6 +60,7 @@ if game:IsLoaded() then
             -- ---------------------------------
 
             if lootFound then 
+                -- หากมีการวาร์ปไป Loot ในขั้นตอนที่ 1 (สันนิษฐานว่า Loot สำเร็จแล้ว)
                 
                 -- A. Teleport ไปยังพื้นที่ Secure Area (รถตู้)
                 HRP.CFrame = CFrame.new(BagSecurePosition)
@@ -85,7 +80,7 @@ if game:IsLoaded() then
             -- ---------------------------------
             
             if not lootFound then
-                wait(10)
+                wait(10) -- ถ้าหา Loot ไม่พบ ให้รอ 10 วินาทีก่อนเริ่มหาใหม่
             end
         end
     end)()
