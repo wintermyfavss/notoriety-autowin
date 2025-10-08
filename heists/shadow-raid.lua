@@ -2,54 +2,70 @@ print("info 1")
 wait(4)
 
 if game:IsLoaded() then
+    local Players = game:GetService("Players")
+    local Player = Players.LocalPlayer
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local Workspace = game:GetService("Workspace")
+    local Remotes = ReplicatedStorage.RS_Package.Remotes -- เพิ่ม Remotes เข้ามา
+
+    -- ตรวจสอบและรอการโหลดของตัวละครและ HumanoidRootPart
+    local character = Player.Character or Player.CharacterAdded:Wait()
+    local HRP = character:WaitForChild("HumanoidRootPart")
     
-    -- *************************************************************
-    -- ** NEW: Instant Interact Setup (ใช้ fireproximityprompt) **
-    -- *************************************************************
-    local ProximityPromptService = game:GetService("ProximityPromptService")
-    local instantInteractEnabled = true
-
-    ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt, player)
-        if instantInteractEnabled then
-            -- สั่งให้ Prompt ทำงานทันทีเมื่อเริ่มกดปุ่มค้าง
-            fireproximityprompt(prompt) 
+    local BagSecurePosition = Workspace.BagSecuredArea.FloorPart.Position
+    
+    
+    --------------------------------------------------------------------------------
+    -- A. ฟังก์ชัน AUTO-INTERACT / AUTO-LOOT (ใช้แทนการ Loot ด้วยมือ)
+    --------------------------------------------------------------------------------
+    
+    local function AutoInteract(promptInstance)
+        -- จำลองการกดปุ่มค้างตามระยะเวลาที่กำหนดใน ProximityPrompt
+        if promptInstance and promptInstance:IsA("ProximityPrompt") then
+            
+            -- ตรวจสอบเงื่อนไขเพิ่มเติม (ถ้ามี) ก่อนเริ่ม Interac
+            
+            promptInstance:InputHoldBegin()
+            task.wait(promptInstance.HoldDuration) -- หน่วงเวลาตามระยะการกดค้างจริง
+            promptInstance:InputHoldEnd()
+            
+            return true
         end
-    end)
-    print("Info: Instant Interact (fireproximityprompt) is now active.")
-    -- *************************************************************
+        return false
+    end
 
-    local HRP = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart
-    local Remotes = game:GetService("ReplicatedStorage").RS_Package.Remotes -- เพิ่ม Remotes เข้ามา
-    local BagSecurePosition = game:GetService("Workspace").BagSecuredArea.FloorPart.Position
-    local Player = game:GetService("Players").LocalPlayer
 
     -- Auto-win code (จัดการ Loot และ Auto-Throw ตามจังหวะเวลา)
     coroutine.wrap(function()
-        -- กำหนดเวลา Looting และ Securing ด้วยมือ (สามารถปรับได้ตามความเหมาะสม)
-        local LootWaitTime = 2.0 -- ลดเวลารอ เพราะ Loot จะสำเร็จทันทีที่คุณกดปุ่ม
-        local ThrowWaitTime = 1 -- เวลาหน่วงเพื่อให้เซิร์ฟเวอร์ประมวลผลการ Throw
+        -- กำหนดเวลาสำหรับ Throw
+        local ThrowWaitTime = 2 -- เวลาหน่วงเพื่อให้เซิร์ฟเวอร์ประมวลผลการ Throw
 
         while true do 
             
             -- ---------------------------------
-            -- 1. TELEPORT TO LOOT ชิ้นถัดไป
+            -- 1. TELEPORT และ AUTO-LOOT ชิ้นถัดไป
             -- ---------------------------------
 
             local lootFound = false
             
             -- ค้นหาและ Teleport ไปยัง Loot Item ที่ยังไม่ถูก Loot
-            for _, v in pairs(game.Workspace.BigLoot:GetDescendants()) do
+            for _, v in pairs(Workspace.BigLoot:GetDescendants()) do
                 local prompt = v:FindFirstChildOfClass("ProximityPrompt")
 
                 if v:IsA("Part") and prompt then
 
                     -- A. Teleport ไปที่ Loot Item
                     HRP.CFrame = CFrame.new(v.Position)
-                    print("Info: Teleported to Loot. **Press Interact Button (e.g., 'E') to Instant Loot.**")
+                    wait(0.1) -- หน่วงเวลาเล็กน้อยให้ตัวละครตั้งตัว
+                    
+                    print("Info: Teleported to Loot. Attempting Auto-Loot...")
                     lootFound = true
                     
-                    -- B. รอเวลาสั้นๆ (0.5 วินาที) เพื่อให้คุณกดปุ่ม Interact
-                    wait(LootWaitTime) 
+                    -- B. ทำการ Auto-Loot โดยเรียกใช้ฟังก์ชันใหม่
+                    if AutoInteract(prompt) then
+                        print("Info: Auto-Loot action successful.")
+                        wait(0.5) -- หน่วงเวลาหลัง Loot สำเร็จ (ให้เกมประมวลผล)
+                    end
                     
                     break -- วาร์ปไปที่ชิ้นแรกแล้วออกจากลูปหา Loot
                 end
@@ -60,7 +76,7 @@ if game:IsLoaded() then
             -- ---------------------------------
 
             if lootFound then 
-                -- หากมีการวาร์ปไป Loot ในขั้นตอนที่ 1 (สันนิษฐานว่า Loot สำเร็จแล้ว)
+                -- หากมีการวาร์ปไป Loot ในขั้นตอนที่ 1
                 
                 -- A. Teleport ไปยังพื้นที่ Secure Area (รถตู้)
                 HRP.CFrame = CFrame.new(BagSecurePosition)
@@ -88,8 +104,8 @@ if game:IsLoaded() then
     -- Click the "ready" button 
     coroutine.wrap(function()
         while wait() do
-            if game:GetService("ReplicatedStorage")["RS_Package"].ReplicatedGameStatus.BagsSecured.Value > 10 then
-                for _, v in pairs(getconnections(game:GetService("Players").LocalPlayer.PlayerGui["SG_Package"].MainGui.PregameFrame["button_playerReady"].MouseButton1Click)) do
+            if ReplicatedStorage["RS_Package"].ReplicatedGameStatus.BagsSecured.Value > 10 then
+                for _, v in pairs(getconnections(Player.PlayerGui["SG_Package"].MainGui.PregameFrame["button_playerReady"].MouseButton1Click)) do
                     v.Function()
                 end
             end
@@ -99,9 +115,9 @@ if game:IsLoaded() then
     -- If heist results appear, teleport back to lobby 
     coroutine.wrap(function()
         while wait() do
-            if game:GetService("Players").LocalPlayer.PlayerGui["SG_Package"].MainGui["frame_heistResults"].Visible then
+            if Player.PlayerGui["SG_Package"].MainGui["frame_heistResults"].Visible then
                 wait(2.5)
-                game:GetService("TeleportService"):Teleport(21532277, game.Players.LocalPlayer)
+                game:GetService("TeleportService"):Teleport(21532277, Player)
             end
         end
     end)()
